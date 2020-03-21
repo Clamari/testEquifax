@@ -1,6 +1,8 @@
 package com.equifax.course.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,18 +34,44 @@ public class CourseRestController
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<Course> show(@PathVariable Integer id)
+	public ResponseEntity<?> show(@PathVariable Integer id)
 	{
 		Course course = courseDao.findById(id).orElse(null);
-		return new ResponseEntity<Course>(course, (course != null ? HttpStatus.OK : HttpStatus.NOT_FOUND));
+		if (course != null) return new ResponseEntity<Course>(course, HttpStatus.OK);
+		else
+		{
+			Map<String, String> errors = new HashMap<String, String>();
+			errors.put("message", "course id '" + id + "' does not exists");
+			return new ResponseEntity<Map<String, String>>(errors, HttpStatus.NOT_FOUND);
+		}
 	}
 
 	@PostMapping("/create")
 	@ResponseStatus(HttpStatus.CREATED)
-	public Course create(@RequestBody Course course)
+	public ResponseEntity<?> create(@RequestBody Course course)
 	{
-		if(course.getId() != null) return null;
-		else return courseDao.save(course);
+		if (course.getId() == null)
+		{
+			try
+			{
+				course = courseDao.save(course);
+				return new ResponseEntity<Course>(course, HttpStatus.OK);
+			}
+			catch (Exception e)
+			{
+				course = null;
+				Map<String, String> errors = new HashMap<String, String>();
+				errors.put("message", e.getMessage());
+				return new ResponseEntity<Map<String, String>>(errors, HttpStatus.BAD_REQUEST);
+			}
+		}
+		else
+		{
+			course = null;
+			Map<String, String> errors = new HashMap<String, String>();
+			errors.put("message", "course id must be null or undefined");
+			return new ResponseEntity<Map<String, String>>(errors, HttpStatus.BAD_REQUEST);
+		}
 	}
 
 	@PutMapping("/edit")
