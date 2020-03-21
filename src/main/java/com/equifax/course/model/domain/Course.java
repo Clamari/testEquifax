@@ -4,15 +4,11 @@ package com.equifax.course.model.domain;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -27,17 +23,17 @@ public class Course implements Serializable
 	private Integer idCourse;
 	private String code;
 	private String name;
-	private List<Student> students = new ArrayList<>();
+//	private List<Student> students = new ArrayList<>();
 
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
 	@Column(name = "id_course", unique = true, nullable = false)
-	public Integer getIdCourse()
+	public Integer getId()
 	{
 		return this.idCourse;
 	}
 
-	public void setIdCourse(Integer idCourse)
+	public void setId(Integer idCourse)
 	{
 		this.idCourse = idCourse;
 	}
@@ -64,14 +60,14 @@ public class Course implements Serializable
 		this.name = name;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "course")
-	public List<Student> getStudents()
-	{
-		return this.students;
-	}
-
-	public void setStudents(List<Student> students)
-	{
-		this.students = students;
-	}
+//	@OneToMany(fetch = FetchType.LAZY, mappedBy = "course")
+//	public List<Student> getStudents()
+//	{
+//		return this.students;
+//	}
+//
+//	public void setStudents(List<Student> students)
+//	{
+//		this.students = students;
+//	}
 }

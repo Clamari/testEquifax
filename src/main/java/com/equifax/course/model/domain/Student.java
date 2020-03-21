@@ -1,17 +1,14 @@
 package com.equifax.course.model.domain;
 // Generated Mar 20, 2020, 10:36:34 PM by Hibernate Tools 5.2.12.Final
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
 import static javax.persistence.GenerationType.IDENTITY;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -24,7 +21,8 @@ public class Student implements Serializable
 	private static final long serialVersionUID = 1L;
 
 	private Integer idStudent;
-	private Course course;
+//	private Course course;
+	private Integer courseId;
 	private String rut;
 	private String name;
 	private String lastName;
@@ -33,26 +31,37 @@ public class Student implements Serializable
 	@Id
 	@GeneratedValue(strategy = IDENTITY)
 	@Column(name = "id_student", unique = true, nullable = false)
-	public Integer getIdStudent()
+	public Integer getId()
 	{
 		return this.idStudent;
 	}
 
-	public void setIdStudent(Integer idStudent)
+	public void setId(Integer idStudent)
 	{
 		this.idStudent = idStudent;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "course_id", nullable = false)
-	public Course getCourse()
+//	@ManyToOne(fetch = FetchType.LAZY)
+//	@JoinColumn(name = "course_id", nullable = false)
+//	public Course getCourse()
+//	{
+//		return this.course;
+//	}
+//
+//	public void setCourse(Course course)
+//	{
+//		this.course = course;
+//	}
+
+	@Column(name = "course_id", nullable = false)
+	public Integer getcourseId()
 	{
-		return this.course;
+		return this.courseId;
 	}
 
-	public void setCourse(Course course)
+	public void setcourseId(Integer courseId)
 	{
-		this.course = course;
+		this.courseId = courseId;
 	}
 
 	@Column(name = "rut", nullable = false, length = 11)
