@@ -116,3 +116,8 @@ INSERT INTO `equifax`.`Courses` (`code`, `name`) VALUES ('a096', 'Biology');
 INSERT INTO `equifax`.`Courses` (`code`, `name`) VALUES ('a097', 'History');
 INSERT INTO `equifax`.`Courses` (`code`, `name`) VALUES ('a098', 'Maths');
 INSERT INTO `equifax`.`Courses` (`code`, `name`) VALUES ('a099', 'Language');
+
+INSERT INTO `equifax`.`Students` (`course_id`, `rut`, `name`, `last_name`, `age`) VALUES ('1', '17700519-3', 'Claudio', 'Marimón Manicke', '29');
+INSERT INTO `equifax`.`Students` (`course_id`, `rut`, `name`, `last_name`, `age`) VALUES ('1', '4947847-K', 'Claudio', 'Marimón Morales', '73');
+INSERT INTO `equifax`.`Students` (`course_id`, `rut`, `name`, `last_name`, `age`) VALUES ('2', '17325603-5', 'Marcela', 'Muñoz', '30');
+INSERT INTO `equifax`.`Students` (`course_id`, `rut`, `name`, `last_name`, `age`) VALUES ('2', '6052916-7', 'Angélica', 'Scholz', '67');

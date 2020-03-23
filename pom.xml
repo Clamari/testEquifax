@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>com.equifax</groupId>
 	<artifactId>restapi</artifactId>
-	<version>0.8.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>test-equifax</name>
 	<description>Course and students REST maintainer</description>
 

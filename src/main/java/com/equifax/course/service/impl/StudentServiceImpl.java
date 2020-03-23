@@ -1,14 +1,27 @@
 package com.equifax.course.service.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.equifax.course.model.domain.Student;
 import com.equifax.course.service.StudentService;
 
 @Service
 public class StudentServiceImpl implements StudentService
 {
+	@Value("${StudentRestController.create.invalidrut}")
+	private String createinvalidrut;
+
+	@Value("${StudentRestController.create.invalidage}")
+	private String createinvalidage;
+
+	@Value("${StudentRestController.create.nullcourse}")
+	private String createnullcourse;
+
 	@Override
 	public boolean validateRut(String rut)
 	{
@@ -35,5 +48,15 @@ public class StudentServiceImpl implements StudentService
 			}
 		}
 		return valid;
+	}
+
+	@Override
+	public List<String> validateStudent(Student student)
+	{
+		List<String> errors = new ArrayList<String>();
+		if (!validateRut(student.getRut())) errors.add(createinvalidrut);
+		if (student.getAge() < 18) errors.add(createinvalidage);
+		if (student.getCourseId() == null) errors.add(createnullcourse);
+		return errors;
 	}
 }

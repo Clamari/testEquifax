@@ -7,10 +7,17 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,85 +38,91 @@ public class StudentRestController
 	@Autowired
 	private StudentService studentService;
 
-	@Value("${StudentRestController.create.invalidrut}")
-	private String createinvalidrut;
-
-	@Value("${StudentRestController.create.invalidage}")
-	private String createinvalidage;
-
-	@Value("${StudentRestController.create.nullcourse}")
-	private String createnullcourse;
-
 	@Value("${StudentRestController.create.idnotnull}")
 	private String createidnotnull;
 
-//	@GetMapping("/list/{page}")
-//	@Secured({ MyConstants.ROLE_ADMIN, MyConstants.ROLE_DIRECTOR })
-//	public ResponseEntity<?> list(@PathVariable Integer page)
-//	{
-//		int rows = 10;
-//		Map<String, Object> json = new HashMap<String, Object>();
-//		List<Object> jsonCourses = new ArrayList<Object>();
-//		Pageable pageable = PageRequest.of(page, rows);
-//		Page<Course> courses = courseDao.findAllByOrderByIdAsc(pageable);
-//		for (Course course : courses)
-//		{
-//			Map<String, Object> jsonCourse = new HashMap<String, Object>();
-//			jsonCourse.put("idCourse", course.getId());
-//			jsonCourse.put("code", course.getCode());
-//			jsonCourse.put("name", course.getName());
-//			jsonCourses.add(jsonCourse);
-//		}
-//		json.put("totalPages", courses.getTotalPages());
-//		json.put("currentPage", courses.getNumber());
-//		json.put("rowsPerPage", courses.getSize());
-//		json.put("rowsInThisPage", courses.getNumberOfElements());
-//		json.put("totalRows", courses.getTotalElements());
-//		json.put("courses", jsonCourses);
-//		if (courses.getNumber() > courses.getTotalPages()-1) return new ResponseEntity<Map<String, Object>>(json, HttpStatus.NOT_FOUND);
-//		else return new ResponseEntity<Map<String, Object>>(json, HttpStatus.OK);
-//	}
-//
-//	@GetMapping("/all")
-//	@Secured({ MyConstants.ROLE_ADMIN, MyConstants.ROLE_DIRECTOR })
-//	public ResponseEntity<?> all()
-//	{
-//		Map<String, Object> json = new HashMap<String, Object>();
-//		List<Object> jsonCourses = new ArrayList<Object>();
-//		List<Course> courses = courseDao.findAll();
-//		for (Course course : courses)
-//		{
-//			Map<String, Object> jsonCourse = new HashMap<String, Object>();
-//			jsonCourse.put("idCourse", course.getId());
-//			jsonCourse.put("code", course.getCode());
-//			jsonCourse.put("name", course.getName());
-//			jsonCourses.add(jsonCourse);
-//		}
-//		json.put("courses", jsonCourses);
-//		return new ResponseEntity<Map<String, Object>>(json, HttpStatus.OK);
-//	}
-//
-//	@GetMapping("/{id}")
-//	@Secured({ MyConstants.ROLE_ADMIN, MyConstants.ROLE_DIRECTOR })
-//	public ResponseEntity<?> show(@PathVariable Integer id)
-//	{
-//		Course course = courseDao.findById(id).orElse(null);
-//		if (course != null)
-//		{
-//			Map<String, Object> jsonCourse = new HashMap<String, Object>();
-//			jsonCourse.put("idCourse", course.getId());
-//			jsonCourse.put("code", course.getCode());
-//			jsonCourse.put("name", course.getName());
-//			return new ResponseEntity<Map<String, Object>>(jsonCourse, HttpStatus.OK);
-//		}
-//		else
-//		{
-//			Map<String, String> errors = new HashMap<String, String>();
-//			errors.put("message", generalnoid + id);
-//			return new ResponseEntity<Map<String, String>>(errors, HttpStatus.NOT_FOUND);
-//		}
-//	}
-//
+	@Value("${StudentRestController.general.noid}")
+	private String generalnoid;
+
+	@Value("${StudentRestController.delete.deleted}")
+	private String deletedeleted;
+
+	@GetMapping("/list/{page}")
+	@Secured({ MyConstants.ROLE_ADMIN, MyConstants.ROLE_TEACHER })
+	public ResponseEntity<?> list(@PathVariable Integer page)
+	{
+		int rows = 10;
+		Map<String, Object> json = new HashMap<String, Object>();
+		List<Object> jsonStudents = new ArrayList<Object>();
+		Pageable pageable = PageRequest.of(page, rows);
+		Page<Student> students = studentDao.findAllByOrderByIdAsc(pageable);
+		for (Student student : students)
+		{
+			Map<String, Object> jsonStudent = new HashMap<String, Object>();
+			jsonStudent.put("idStudent", student.getId());
+			jsonStudent.put("courseId", student.getCourse().getId());
+			jsonStudent.put("rut", student.getRut());
+			jsonStudent.put("name", student.getName());
+			jsonStudent.put("lastName", student.getLastName());
+			jsonStudent.put("age", student.getAge());
+			jsonStudents.add(jsonStudent);
+		}
+		json.put("totalPages", students.getTotalPages());
+		json.put("currentPage", students.getNumber());
+		json.put("rowsPerPage", students.getSize());
+		json.put("rowsInThisPage", students.getNumberOfElements());
+		json.put("totalRows", students.getTotalElements());
+		json.put("students", jsonStudents);
+		if (students.getNumber() > students.getTotalPages() - 1) return new ResponseEntity<Map<String, Object>>(json, HttpStatus.NOT_FOUND);
+		else return new ResponseEntity<Map<String, Object>>(json, HttpStatus.OK);
+	}
+
+	@GetMapping("/all")
+	@Secured({ MyConstants.ROLE_ADMIN, MyConstants.ROLE_TEACHER })
+	public ResponseEntity<?> all()
+	{
+		Map<String, Object> json = new HashMap<String, Object>();
+		List<Object> jsonStudents = new ArrayList<Object>();
+		List<Student> students = studentDao.findAll();
+		for (Student student : students)
+		{
+			Map<String, Object> jsonStudent = new HashMap<String, Object>();
+			jsonStudent.put("idStudent", student.getId());
+			jsonStudent.put("courseId", student.getCourse().getId());
+			jsonStudent.put("rut", student.getRut());
+			jsonStudent.put("name", student.getName());
+			jsonStudent.put("lastName", student.getLastName());
+			jsonStudent.put("age", student.getAge());
+			jsonStudents.add(jsonStudent);
+		}
+		json.put("students", jsonStudents);
+		return new ResponseEntity<Map<String, Object>>(json, HttpStatus.OK);
+	}
+
+	@GetMapping("/{id}")
+	@Secured({ MyConstants.ROLE_ADMIN, MyConstants.ROLE_TEACHER })
+	public ResponseEntity<?> show(@PathVariable Integer id)
+	{
+		Student student = studentDao.findById(id).orElse(null);
+		if (student != null)
+		{
+			Map<String, Object> jsonStudent = new HashMap<String, Object>();
+			jsonStudent.put("idStudent", student.getId());
+			jsonStudent.put("courseId", student.getCourse().getId());
+			jsonStudent.put("rut", student.getRut());
+			jsonStudent.put("name", student.getName());
+			jsonStudent.put("lastName", student.getLastName());
+			jsonStudent.put("age", student.getAge());
+			return new ResponseEntity<Map<String, Object>>(jsonStudent, HttpStatus.OK);
+		}
+		else
+		{
+			Map<String, String> errors = new HashMap<String, String>();
+			errors.put("message", generalnoid + id);
+			return new ResponseEntity<Map<String, String>>(errors, HttpStatus.NOT_FOUND);
+		}
+	}
+
 	@PostMapping("/create")
 	@Secured({ MyConstants.ROLE_ADMIN, MyConstants.ROLE_TEACHER })
 	public ResponseEntity<?> create(@RequestBody Student student)
@@ -117,10 +130,7 @@ public class StudentRestController
 		Map<String, Object> json = new HashMap<String, Object>();
 		if (student.getId() == null)
 		{
-			List<String> errors = new ArrayList<String>();
-			if (!studentService.validateRut(student.getRut())) errors.add(createinvalidrut);
-			if (student.getAge() < 18) errors.add(createinvalidage);
-			if (student.getCourseId() == null) errors.add(createnullcourse);
+			List<String> errors = studentService.validateStudent(student);
 			if (errors.isEmpty())
 			{
 				student.setRut(student.getRut().toUpperCase());// Always save with capital K
@@ -139,7 +149,6 @@ public class StudentRestController
 				}
 				catch (Exception e)
 				{
-					student = null;
 					json.put("error", e.getMessage());
 					return new ResponseEntity<Map<String, Object>>(json, HttpStatus.BAD_REQUEST);
 				}
@@ -152,62 +161,72 @@ public class StudentRestController
 		}
 		else
 		{
-			student = null;
 			json.put("error", createidnotnull);
 			return new ResponseEntity<Map<String, Object>>(json, HttpStatus.BAD_REQUEST);
 		}
 	}
-//
-//	@PutMapping("/edit/{id}")
-//	@Secured({ MyConstants.ROLE_ADMIN, MyConstants.ROLE_DIRECTOR })
-//	public ResponseEntity<?> edit(@PathVariable Integer id, @RequestBody Course course)
-//	{
-//		try
-//		{
-//			Course currentCourse = courseDao.findById(id).orElse(null);
-//			if (currentCourse != null)
-//			{
-//				course.setId(id);
-//				course = courseDao.save(course);
-//				Map<String, Object> jsonCourse = new HashMap<String, Object>();
-//				jsonCourse.put("idCourse", course.getId());
-//				jsonCourse.put("code", course.getCode());
-//				jsonCourse.put("name", course.getName());
-//				return new ResponseEntity<Map<String, Object>>(jsonCourse, HttpStatus.OK);
-//			}
-//			else
-//			{
-//				Map<String, String> errors = new HashMap<String, String>();
-//				errors.put("message", generalnoid + id);
-//				return new ResponseEntity<Map<String, String>>(errors, HttpStatus.NOT_FOUND);
-//			}
-//		}
-//		catch (Exception e)
-//		{
-//			course = null;
-//			Map<String, String> errors = new HashMap<String, String>();
-//			errors.put("message", e.getMessage());
-//			return new ResponseEntity<Map<String, String>>(errors, HttpStatus.BAD_REQUEST);
-//		}
-//	}
-//
-//	@DeleteMapping("/delete/{id}")
-//	@Secured({ MyConstants.ROLE_ADMIN, MyConstants.ROLE_DIRECTOR })
-//	public ResponseEntity<?> delete(@PathVariable Integer id)
-//	{
-//		Course currentCourse = courseDao.findById(id).orElse(null);
-//		if (currentCourse != null)
-//		{
-//			courseDao.deleteById(id);
-//			Map<String, Object> json = new HashMap<String, Object>();
-//			json.put("message", deletedeleted + id);
-//			return new ResponseEntity<Map<String, Object>>(json, HttpStatus.OK);
-//		}
-//		else
-//		{
-//			Map<String, String> errors = new HashMap<String, String>();
-//			errors.put("message", generalnoid + id);
-//			return new ResponseEntity<Map<String, String>>(errors, HttpStatus.NOT_FOUND);
-//		}
-//	}
+
+	@PutMapping("/edit/{id}")
+	@Secured({ MyConstants.ROLE_ADMIN, MyConstants.ROLE_TEACHER })
+	public ResponseEntity<?> edit(@PathVariable Integer id, @RequestBody Student student)
+	{
+		Map<String, Object> json = new HashMap<String, Object>();
+		Student currentStudent = studentDao.findById(id).orElse(null);
+		if (currentStudent != null)
+		{
+			List<String> errors = studentService.validateStudent(student);
+			if (errors.isEmpty())
+			{
+				try
+				{
+					student.setCourse(new Course());
+					student.getCourse().setId(student.getCourseId());
+					student.setId(id);
+					student = studentDao.save(student);
+					json.put("idStudent", student.getId());
+					json.put("courseId", student.getCourse().getId());
+					json.put("rut", student.getRut());
+					json.put("name", student.getName());
+					json.put("lastName", student.getLastName());
+					json.put("age", student.getAge());
+					return new ResponseEntity<Map<String, Object>>(json, HttpStatus.OK);
+				}
+				catch (Exception e)
+				{
+					json.put("error", e.getMessage());
+					return new ResponseEntity<Map<String, Object>>(json, HttpStatus.BAD_REQUEST);
+				}
+			}
+			else
+			{
+				json.put("errors", errors);
+				return new ResponseEntity<Map<String, Object>>(json, HttpStatus.BAD_REQUEST);
+			}
+		}
+		else
+		{
+			json.put("error", generalnoid + id);
+			return new ResponseEntity<Map<String, Object>>(json, HttpStatus.NOT_FOUND);
+		}
+	}
+
+	@DeleteMapping("/delete/{id}")
+	@Secured({ MyConstants.ROLE_ADMIN, MyConstants.ROLE_TEACHER })
+	public ResponseEntity<?> delete(@PathVariable Integer id)
+	{
+		Student currentStudent = studentDao.findById(id).orElse(null);
+		if (currentStudent != null)
+		{
+			studentDao.deleteById(id);
+			Map<String, Object> json = new HashMap<String, Object>();
+			json.put("message", deletedeleted + id);
+			return new ResponseEntity<Map<String, Object>>(json, HttpStatus.OK);
+		}
+		else
+		{
+			Map<String, String> errors = new HashMap<String, String>();
+			errors.put("error", generalnoid + id);
+			return new ResponseEntity<Map<String, String>>(errors, HttpStatus.NOT_FOUND);
+		}
+	}
 }
