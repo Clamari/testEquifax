@@ -65,7 +65,7 @@ public class CourseRestController
 		json.put("rowsInThisPage", courses.getNumberOfElements());
 		json.put("totalRows", courses.getTotalElements());
 		json.put("courses", jsonCourses);
-		if (courses.getNumber() > courses.getTotalPages()-1) return new ResponseEntity<Map<String, Object>>(json, HttpStatus.NOT_FOUND);
+		if (courses.getNumber() > courses.getTotalPages() - 1) return new ResponseEntity<Map<String, Object>>(json, HttpStatus.NOT_FOUND);
 		else return new ResponseEntity<Map<String, Object>>(json, HttpStatus.OK);
 	}
 
@@ -113,31 +113,27 @@ public class CourseRestController
 	@Secured({ MyConstants.ROLE_ADMIN, MyConstants.ROLE_DIRECTOR })
 	public ResponseEntity<?> create(@RequestBody Course course)
 	{
+		Map<String, Object> json = new HashMap<String, Object>();
 		if (course.getId() == null)
 		{
 			try
 			{
 				course = courseDao.save(course);
-				Map<String, Object> jsonCourse = new HashMap<String, Object>();
-				jsonCourse.put("idCourse", course.getId());
-				jsonCourse.put("code", course.getCode());
-				jsonCourse.put("name", course.getName());
-				return new ResponseEntity<Map<String, Object>>(jsonCourse, HttpStatus.CREATED);
+				json.put("idCourse", course.getId());
+				json.put("code", course.getCode());
+				json.put("name", course.getName());
+				return new ResponseEntity<Map<String, Object>>(json, HttpStatus.CREATED);
 			}
 			catch (Exception e)
 			{
-				course = null;
-				Map<String, String> errors = new HashMap<String, String>();
-				errors.put("message", e.getMessage());
-				return new ResponseEntity<Map<String, String>>(errors, HttpStatus.BAD_REQUEST);
+				json.put("error", e.getMessage());
+				return new ResponseEntity<Map<String, Object>>(json, HttpStatus.BAD_REQUEST);
 			}
 		}
 		else
 		{
-			course = null;
-			Map<String, String> errors = new HashMap<String, String>();
-			errors.put("message", createidnotnull);
-			return new ResponseEntity<Map<String, String>>(errors, HttpStatus.BAD_REQUEST);
+			json.put("error", createidnotnull);
+			return new ResponseEntity<Map<String, Object>>(json, HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -145,32 +141,29 @@ public class CourseRestController
 	@Secured({ MyConstants.ROLE_ADMIN, MyConstants.ROLE_DIRECTOR })
 	public ResponseEntity<?> edit(@PathVariable Integer id, @RequestBody Course course)
 	{
-		try
+		Map<String, Object> json = new HashMap<String, Object>();
+		Course currentCourse = courseDao.findById(id).orElse(null);
+		if (currentCourse != null)
 		{
-			Course currentCourse = courseDao.findById(id).orElse(null);
-			if (currentCourse != null)
+			course.setId(id);
+			try
 			{
-				course.setId(id);
 				course = courseDao.save(course);
-				Map<String, Object> jsonCourse = new HashMap<String, Object>();
-				jsonCourse.put("idCourse", course.getId());
-				jsonCourse.put("code", course.getCode());
-				jsonCourse.put("name", course.getName());
-				return new ResponseEntity<Map<String, Object>>(jsonCourse, HttpStatus.OK);
+				json.put("idCourse", course.getId());
+				json.put("code", course.getCode());
+				json.put("name", course.getName());
+				return new ResponseEntity<Map<String, Object>>(json, HttpStatus.OK);
 			}
-			else
+			catch (Exception e)
 			{
-				Map<String, String> errors = new HashMap<String, String>();
-				errors.put("message", generalnoid + id);
-				return new ResponseEntity<Map<String, String>>(errors, HttpStatus.NOT_FOUND);
+				json.put("error", e.getMessage());
+				return new ResponseEntity<Map<String, Object>>(json, HttpStatus.BAD_REQUEST);
 			}
 		}
-		catch (Exception e)
+		else
 		{
-			course = null;
-			Map<String, String> errors = new HashMap<String, String>();
-			errors.put("message", e.getMessage());
-			return new ResponseEntity<Map<String, String>>(errors, HttpStatus.BAD_REQUEST);
+			json.put("message", generalnoid + id);
+			return new ResponseEntity<Map<String, Object>>(json, HttpStatus.NOT_FOUND);
 		}
 	}
 

@@ -134,10 +134,10 @@ public class StudentRestController
 			if (errors.isEmpty())
 			{
 				student.setRut(student.getRut().toUpperCase());// Always save with capital K
+				student.setCourse(new Course());
+				student.getCourse().setId(student.getCourseId());
 				try
 				{
-					student.setCourse(new Course());
-					student.getCourse().setId(student.getCourseId());
 					student = studentDao.save(student);
 					json.put("idStudent", student.getId());
 					json.put("courseId", student.getCourse().getId());
@@ -177,11 +177,11 @@ public class StudentRestController
 			List<String> errors = studentService.validateStudent(student);
 			if (errors.isEmpty())
 			{
+				student.setCourse(new Course());
+				student.getCourse().setId(student.getCourseId());
+				student.setId(id);
 				try
 				{
-					student.setCourse(new Course());
-					student.getCourse().setId(student.getCourseId());
-					student.setId(id);
 					student = studentDao.save(student);
 					json.put("idStudent", student.getId());
 					json.put("courseId", student.getCourse().getId());
