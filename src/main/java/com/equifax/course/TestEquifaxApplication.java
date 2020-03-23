@@ -9,5 +9,4 @@ public class TestEquifaxApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(TestEquifaxApplication.class, args);
 	}
-
 }

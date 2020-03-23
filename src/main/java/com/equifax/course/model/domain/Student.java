@@ -64,7 +64,7 @@ public class Student implements Serializable
 		this.courseId = courseId;
 	}
 
-	@Column(name = "rut", nullable = false, length = 11)
+	@Column(name = "rut", unique = true, nullable = false, length = 11)
 	public String getRut()
 	{
 		return this.rut;

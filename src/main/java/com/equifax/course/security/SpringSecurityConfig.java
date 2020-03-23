@@ -8,23 +8,16 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.User.UserBuilder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.equifax.course.service.JpaUserDetailsService;
 
 @EnableGlobalMethodSecurity(securedEnabled = true)
 @Configuration
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter
 {
-	@Override
-	protected void configure(HttpSecurity http) throws Exception
-	{
-		http.authorizeRequests().antMatchers("/").permitAll().anyRequest().authenticated()
-		.and().addFilter(new JWTAuthenticationFilter(authenticationManager()))
-		.addFilter(new JWTAuthorizationtionFilter(authenticationManager())).csrf().disable()
-		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-	}
+	@Autowired
+	private JpaUserDetailsService jpaUserDetailsService;
 
 	@Bean
 	public BCryptPasswordEncoder passwordEncoder()
@@ -32,15 +25,21 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter
 		return new BCryptPasswordEncoder();
 	}
 
+	@Override
+	protected void configure(HttpSecurity http) throws Exception
+	{
+		http.authorizeRequests()
+		.antMatchers("/users/password").permitAll() // development password encryptor
+		.anyRequest().authenticated()
+		.and()
+		.addFilter(new JWTAuthenticationFilter(authenticationManager()))
+		.addFilter(new JWTAuthorizationtionFilter(authenticationManager()))
+		.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+	}
+
 	@Autowired
 	public void configurerGlobal(AuthenticationManagerBuilder builder) throws Exception
 	{
-		PasswordEncoder encoder = passwordEncoder();
-		UserBuilder user = User.builder().passwordEncoder(encoder::encode);
-		builder.inMemoryAuthentication()
-		.withUser(user.username("god").password("asdgod").roles("ADMIN", "DIRECTOR", "TEACHER"))
-		.withUser(user.username("admin").password("asdadmin").roles("ADMIN"))
-		.withUser(user.username("director1").password("asddir").roles("DIRECTOR"))
-		.withUser(user.username("teacher1").password("asdtea").roles("TEACHER"));
+		builder.userDetailsService(jpaUserDetailsService).passwordEncoder(passwordEncoder());
 	}
 }

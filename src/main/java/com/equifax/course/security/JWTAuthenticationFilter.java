@@ -69,11 +69,11 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	{
 		Collection<? extends GrantedAuthority> roles = authResult.getAuthorities();
 		Claims claims = Jwts.claims();
-		claims.put("authorities", new ObjectMapper().writeValueAsString(roles));
-		String token = Jwts.builder().setSubject(authResult.getName()).setClaims(claims).signWith(MyConstants.SECRET_KEY)
+		claims.put(MyConstants.JWT_AUTHORITIES, new ObjectMapper().writeValueAsString(roles));
+		String token = Jwts.builder().setSubject(authResult.getName()).setClaims(claims).signWith(MyConstants.JWT_SECRET_KEY)
 				.setIssuedAt(new Date()).setExpiration(new Date(System.currentTimeMillis() + 3600000L)) // 3600000 millis = 1 hour
 				.compact();
-		response.addHeader("Authorization", "Bearer " + token);
+		response.addHeader(MyConstants.JWT_AUTHORIZATION, MyConstants.JWT_BEARER + token);
 		Map<String, String> body = new HashMap<String, String>();
 		body.put("token", token);
 		body.put("user", authResult.getName());

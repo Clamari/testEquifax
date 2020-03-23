@@ -32,8 +32,8 @@ public class JWTAuthorizationtionFilter extends BasicAuthenticationFilter
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException
 	{
-		String header = request.getHeader("Authorization");
-		if (header == null || !header.startsWith("Bearer "))
+		String header = request.getHeader(MyConstants.JWT_AUTHORIZATION);
+		if (header == null || !header.startsWith(MyConstants.JWT_BEARER))
 		{
 			chain.doFilter(request, response);
 			return;
@@ -41,15 +41,15 @@ public class JWTAuthorizationtionFilter extends BasicAuthenticationFilter
 		Claims token = null;
 		try
 		{
-			token = Jwts.parserBuilder().setSigningKey(MyConstants.SECRET_KEY).build().parseClaimsJws(header.replace("Bearer ", "")).getBody();
+			token = Jwts.parserBuilder().setSigningKey(MyConstants.JWT_SECRET_KEY).build().parseClaimsJws(header.replace(MyConstants.JWT_BEARER, "")).getBody();
 		}
 		catch (Exception e) { e.printStackTrace(); }
 		UsernamePasswordAuthenticationToken authToken = null;
 		if (token != null)
 		{
-			byte[] roles = token.get("authorities").toString().getBytes();
+			byte[] roles = token.get(MyConstants.JWT_AUTHORITIES).toString().getBytes();
 			Collection<? extends GrantedAuthority> authorities = Arrays.asList(new ObjectMapper()
-					.addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthoritiesMixin.class).readValue(roles, SimpleGrantedAuthority[].class));
+					.addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityMixin.class).readValue(roles, SimpleGrantedAuthority[].class));
 			authToken = new UsernamePasswordAuthenticationToken(token.getSubject(), null, authorities);
 		}
 		SecurityContextHolder.getContext().setAuthentication(authToken);

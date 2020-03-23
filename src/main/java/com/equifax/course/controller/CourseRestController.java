@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.equifax.course.core.MyConstants;
-import com.equifax.course.model.dao.ICourseDao;
+import com.equifax.course.model.dao.CourseDao;
 import com.equifax.course.model.domain.Course;
 
 @RestController
@@ -27,7 +27,7 @@ import com.equifax.course.model.domain.Course;
 public class CourseRestController
 {
 	@Autowired
-	private ICourseDao courseDao;
+	private CourseDao courseDao;
 
 	@Value("${CourseRestController.show.noid}")
 	private String shownoid;

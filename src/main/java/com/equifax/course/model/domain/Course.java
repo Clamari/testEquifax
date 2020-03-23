@@ -38,7 +38,7 @@ public class Course implements Serializable
 		this.idCourse = idCourse;
 	}
 
-	@Column(name = "code", nullable = false, length = 4)
+	@Column(name = "code", unique = true, nullable = false, length = 4)
 	public String getCode()
 	{
 		return this.code;

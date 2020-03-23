@@ -3,10 +3,10 @@ package com.equifax.course.security;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class SimpleGrantedAuthoritiesMixin
+public class SimpleGrantedAuthorityMixin
 {
 	@JsonCreator
-	public SimpleGrantedAuthoritiesMixin(@JsonProperty("authority") String role)
+	public SimpleGrantedAuthorityMixin(@JsonProperty("authority") String role)
 	{
 	}
 }
