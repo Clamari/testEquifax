@@ -6,7 +6,8 @@ import org.springframework.context.annotation.PropertySources;
 
 @Configuration
 @PropertySources({
-	@PropertySource("classpath:responseCodes.properties")
+	@PropertySource("classpath:responseCodes.properties"),
+	@PropertySource("classpath:messages.properties")
 	})
 public class GlobalPropertiesConfig {
 
