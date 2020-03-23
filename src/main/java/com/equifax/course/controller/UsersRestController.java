@@ -21,11 +21,11 @@ public class UsersRestController
 	private BCryptPasswordEncoder passwordEncoder;
 
 	@PostMapping("/password")
-	public ResponseEntity<?> password(@RequestBody String password)
+	public ResponseEntity<?> password(@RequestBody Map<String, Object> password)
 	{
 		PasswordEncoder encoder = passwordEncoder;
-		Map<String, String> errors = new HashMap<String, String>();
-		errors.put("your_encrypted_password", encoder.encode("password"));
-		return new ResponseEntity<Map<String, String>>(errors, HttpStatus.OK);
+		Map<String, String> response = new HashMap<String, String>();
+		response.put("your_encrypted_password", encoder.encode(password.get("password").toString()));
+		return new ResponseEntity<Map<String, String>>(response, HttpStatus.OK);
 	}
 }

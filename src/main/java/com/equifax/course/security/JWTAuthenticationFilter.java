@@ -32,7 +32,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	public JWTAuthenticationFilter(AuthenticationManager authenticationManager)
 	{
 		this.authenticationManager = authenticationManager;
-		setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/login", "POST"));
+		setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/token", "POST"));
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		Claims claims = Jwts.claims();
 		claims.put(MyConstants.JWT_AUTHORITIES, new ObjectMapper().writeValueAsString(roles));
 		String token = Jwts.builder().setSubject(authResult.getName()).setClaims(claims).signWith(MyConstants.JWT_SECRET_KEY)
-				.setIssuedAt(new Date()).setExpiration(new Date(System.currentTimeMillis() + 3600000L)) // 3600000 millis = 1 hour
+				.setIssuedAt(new Date()).setExpiration(new Date(System.currentTimeMillis() + 3600000L)) // JWT lifetime 3600000 millis = 1 hour
 				.compact();
 		response.addHeader(MyConstants.JWT_AUTHORIZATION, MyConstants.JWT_BEARER + token);
 		Map<String, String> body = new HashMap<String, String>();

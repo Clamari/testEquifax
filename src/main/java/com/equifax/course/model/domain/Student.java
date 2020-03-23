@@ -25,7 +25,6 @@ public class Student implements Serializable
 
 	private Integer idStudent;
 	private Course course;
-//	private Integer courseId;
 	private String rut;
 	private String name;
 	private String lastName;
@@ -55,17 +54,6 @@ public class Student implements Serializable
 	{
 		this.course = course;
 	}
-
-//	@Column(name = "course_id", nullable = false)
-//	public Integer getcourseId()
-//	{
-//		return this.courseId;
-//	}
-//
-//	public void setcourseId(Integer courseId)
-//	{
-//		this.courseId = courseId;
-//	}
 
 	@Column(name = "rut", unique = true, nullable = false, length = 11)
 	public String getRut()

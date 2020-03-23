@@ -2,10 +2,19 @@ INSERT INTO `equifax`.`Roles` (`id_role`, `name`) VALUES ('1', 'ROLE_ADMIN');
 INSERT INTO `equifax`.`Roles` (`id_role`, `name`) VALUES ('2', 'ROLE_DIRECTOR');
 INSERT INTO `equifax`.`Roles` (`id_role`, `name`) VALUES ('3', 'ROLE_TEACHER');
 
---.withUser(user.username("god").password("asdgod").roles("ADMIN", "DIRECTOR", "TEACHER"))
---.withUser(user.username("admin").password("asdadmin").roles("ADMIN"))
---.withUser(user.username("director1").password("asddir").roles("DIRECTOR"))
---.withUser(user.username("teacher1").password("asdtea").roles("TEACHER"));
+INSERT INTO `equifax`.`Users` (`username`, `password`) VALUES ('god', '$2a$10$NwXYgdJsf6tyrbprnsWoPOZgrsHXVR8XTSXpEsaQLz9Nq0WsFPXfm');/*pass asdgod*/
+INSERT INTO `equifax`.`Users_Roles` (`user_id`, `role_id`) VALUES ('1', '1');
+INSERT INTO `equifax`.`Users_Roles` (`user_id`, `role_id`) VALUES ('1', '2');
+INSERT INTO `equifax`.`Users_Roles` (`user_id`, `role_id`) VALUES ('1', '3');
+
+INSERT INTO `equifax`.`Users` (`username`, `password`) VALUES ('admin', '$2a$10$ADp9JqIapWpP9s36lhpfZeo6/uGNosipKDyXakZuqwI.wAijIBtWW');/*pass asdadmin*/
+INSERT INTO `equifax`.`Users_Roles` (`user_id`, `role_id`) VALUES ('2', '1');
+
+INSERT INTO `equifax`.`Users` (`username`, `password`) VALUES ('director', '$2a$10$ONY0.gpyfcJsp/bEzFIxce3COePmGZU.NfOkeGMvyiH95X9MHi4jO');/*pass asddirector*/
+INSERT INTO `equifax`.`Users_Roles` (`user_id`, `role_id`) VALUES ('3', '2');
+
+INSERT INTO `equifax`.`Users` (`username`, `password`) VALUES ('teacher', '$2a$10$qyn8c1.EOhvBlUdlXTHHUen5/t9Ioto2.BPRQshH/.Hd1YhJljmBO');/*pass asdteacher*/
+INSERT INTO `equifax`.`Users_Roles` (`user_id`, `role_id`) VALUES ('4', '3');
 
 INSERT INTO `equifax`.`Courses` (`code`, `name`) VALUES ('a000', 'Biology');
 INSERT INTO `equifax`.`Courses` (`code`, `name`) VALUES ('a001', 'History');

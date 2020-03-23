@@ -1,7 +1,6 @@
 package com.equifax.course.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -19,11 +18,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter
 	@Autowired
 	private JpaUserDetailsService jpaUserDetailsService;
 
-	@Bean
-	public BCryptPasswordEncoder passwordEncoder()
-	{
-		return new BCryptPasswordEncoder();
-	}
+	@Autowired
+	private BCryptPasswordEncoder passwordEncoder;
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception
@@ -40,6 +36,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter
 	@Autowired
 	public void configurerGlobal(AuthenticationManagerBuilder builder) throws Exception
 	{
-		builder.userDetailsService(jpaUserDetailsService).passwordEncoder(passwordEncoder());
+		builder.userDetailsService(jpaUserDetailsService).passwordEncoder(passwordEncoder);
 	}
 }
