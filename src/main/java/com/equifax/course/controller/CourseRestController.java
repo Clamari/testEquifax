@@ -7,6 +7,9 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -39,11 +42,38 @@ public class CourseRestController
 	@Value("${CourseRestController.delete.deleted}")
 	private String deletedeleted;
 
-	@GetMapping({ "", "/", "/list" })
+	@GetMapping("/list/{page}")
 	@Secured({ MyConstants.ROLE_ADMIN, MyConstants.ROLE_DIRECTOR })
-	public ResponseEntity<?> list()
+	public ResponseEntity<?> list(@PathVariable Integer page)
 	{
-		Map<String, List<Object>> json = new HashMap<String, List<Object>>();
+		int rows = 10;
+		Map<String, Object> json = new HashMap<String, Object>();
+		List<Object> jsonCourses = new ArrayList<Object>();
+		Pageable pageable = PageRequest.of(page, rows);
+		Page<Course> courses = courseDao.findAllByOrderByIdAsc(pageable);
+		for (Course course : courses)
+		{
+			Map<String, Object> jsonCourse = new HashMap<String, Object>();
+			jsonCourse.put("idCourse", course.getId());
+			jsonCourse.put("code", course.getCode());
+			jsonCourse.put("name", course.getName());
+			jsonCourses.add(jsonCourse);
+		}
+		json.put("totalPages", courses.getTotalPages());
+		json.put("currentPage", courses.getNumber());
+		json.put("rowsPerPage", courses.getSize());
+		json.put("rowsInThisPage", courses.getNumberOfElements());
+		json.put("totalRows", courses.getTotalElements());
+		json.put("courses", jsonCourses);
+		if (courses.getNumber() > courses.getTotalPages()-1) return new ResponseEntity<Map<String, Object>>(json, HttpStatus.NOT_FOUND);
+		else return new ResponseEntity<Map<String, Object>>(json, HttpStatus.OK);
+	}
+
+	@GetMapping("/all")
+	@Secured({ MyConstants.ROLE_ADMIN, MyConstants.ROLE_DIRECTOR })
+	public ResponseEntity<?> all()
+	{
+		Map<String, Object> json = new HashMap<String, Object>();
 		List<Object> jsonCourses = new ArrayList<Object>();
 		List<Course> courses = courseDao.findAll();
 		for (Course course : courses)
@@ -55,7 +85,7 @@ public class CourseRestController
 			jsonCourses.add(jsonCourse);
 		}
 		json.put("courses", jsonCourses);
-		return new ResponseEntity<Map<String, List<Object>>>(json, HttpStatus.OK);
+		return new ResponseEntity<Map<String, Object>>(json, HttpStatus.OK);
 	}
 
 	@GetMapping("/{id}")
