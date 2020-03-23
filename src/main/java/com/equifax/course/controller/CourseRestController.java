@@ -1,5 +1,6 @@
 package com.equifax.course.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,16 +30,32 @@ public class CourseRestController
 	@Autowired
 	private CourseDao courseDao;
 
-	@Value("${CourseRestController.show.noid}")
-	private String shownoid;
+	@Value("${CourseRestController.general.noid}")
+	private String generalnoid;
 
 	@Value("${CourseRestController.create.idnotnull}")
 	private String createidnotnull;
 
+	@Value("${CourseRestController.delete.deleted}")
+	private String deletedeleted;
+
 	@GetMapping({ "", "/", "/list" })
-	public List<Course> index()
+	@Secured({ MyConstants.ROLE_ADMIN, MyConstants.ROLE_DIRECTOR })
+	public ResponseEntity<?> list()
 	{
-		return courseDao.findAll();
+		Map<String, List<Object>> json = new HashMap<String, List<Object>>();
+		List<Object> jsonCourses = new ArrayList<Object>();
+		List<Course> courses = courseDao.findAll();
+		for (Course course : courses)
+		{
+			Map<String, Object> jsonCourse = new HashMap<String, Object>();
+			jsonCourse.put("idCourse", course.getId());
+			jsonCourse.put("code", course.getCode());
+			jsonCourse.put("name", course.getName());
+			jsonCourses.add(jsonCourse);
+		}
+		json.put("courses", jsonCourses);
+		return new ResponseEntity<Map<String, List<Object>>>(json, HttpStatus.OK);
 	}
 
 	@GetMapping("/{id}")
@@ -46,16 +63,24 @@ public class CourseRestController
 	public ResponseEntity<?> show(@PathVariable Integer id)
 	{
 		Course course = courseDao.findById(id).orElse(null);
-		if (course != null) return new ResponseEntity<Course>(course, HttpStatus.OK);
+		if (course != null)
+		{
+			Map<String, Object> jsonCourse = new HashMap<String, Object>();
+			jsonCourse.put("idCourse", course.getId());
+			jsonCourse.put("code", course.getCode());
+			jsonCourse.put("name", course.getName());
+			return new ResponseEntity<Map<String, Object>>(jsonCourse, HttpStatus.OK);
+		}
 		else
 		{
 			Map<String, String> errors = new HashMap<String, String>();
-			errors.put("message", shownoid + id);
+			errors.put("message", generalnoid + id);
 			return new ResponseEntity<Map<String, String>>(errors, HttpStatus.NOT_FOUND);
 		}
 	}
 
 	@PostMapping("/create")
+	@Secured({ MyConstants.ROLE_ADMIN, MyConstants.ROLE_DIRECTOR })
 	public ResponseEntity<?> create(@RequestBody Course course)
 	{
 		if (course.getId() == null)
@@ -63,7 +88,11 @@ public class CourseRestController
 			try
 			{
 				course = courseDao.save(course);
-				return new ResponseEntity<Course>(course, HttpStatus.CREATED);
+				Map<String, Object> jsonCourse = new HashMap<String, Object>();
+				jsonCourse.put("idCourse", course.getId());
+				jsonCourse.put("code", course.getCode());
+				jsonCourse.put("name", course.getName());
+				return new ResponseEntity<Map<String, Object>>(jsonCourse, HttpStatus.CREATED);
 			}
 			catch (Exception e)
 			{
@@ -82,15 +111,56 @@ public class CourseRestController
 		}
 	}
 
-	@PutMapping("/edit")
-	public Course edit(@RequestBody Course course)
+	@PutMapping("/edit/{id}")
+	@Secured({ MyConstants.ROLE_ADMIN, MyConstants.ROLE_DIRECTOR })
+	public ResponseEntity<?> edit(@PathVariable Integer id, @RequestBody Course course)
 	{
-		return courseDao.save(course);
+		try
+		{
+			Course currentCourse = courseDao.findById(id).orElse(null);
+			if (currentCourse != null)
+			{
+				course.setId(id);
+				course = courseDao.save(course);
+				Map<String, Object> jsonCourse = new HashMap<String, Object>();
+				jsonCourse.put("idCourse", course.getId());
+				jsonCourse.put("code", course.getCode());
+				jsonCourse.put("name", course.getName());
+				return new ResponseEntity<Map<String, Object>>(jsonCourse, HttpStatus.OK);
+			}
+			else
+			{
+				Map<String, String> errors = new HashMap<String, String>();
+				errors.put("message", generalnoid + id);
+				return new ResponseEntity<Map<String, String>>(errors, HttpStatus.NOT_FOUND);
+			}
+		}
+		catch (Exception e)
+		{
+			course = null;
+			Map<String, String> errors = new HashMap<String, String>();
+			errors.put("message", e.getMessage());
+			return new ResponseEntity<Map<String, String>>(errors, HttpStatus.BAD_REQUEST);
+		}
 	}
 
 	@DeleteMapping("/delete/{id}")
-	public void delete(@PathVariable Integer id)
+	@Secured({ MyConstants.ROLE_ADMIN, MyConstants.ROLE_DIRECTOR })
+	public ResponseEntity<?> delete(@PathVariable Integer id)
 	{
-		courseDao.deleteById(id);
+		Course currentCourse = courseDao.findById(id).orElse(null);
+		if (currentCourse != null)
+		{
+			courseDao.deleteById(id);
+			Map<String, Object> json = new HashMap<String, Object>();
+			json.put("message", deletedeleted + id);
+			return new ResponseEntity<Map<String, Object>>(json, HttpStatus.OK);
+		}
+		else
+		{
+			Map<String, String> errors = new HashMap<String, String>();
+			errors.put("message", generalnoid + id);
+			return new ResponseEntity<Map<String, String>>(errors, HttpStatus.NOT_FOUND);
+		}
 	}
 }
