@@ -42,7 +42,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 //		UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken("god", "asdgod");
 //		return authenticationManager.authenticate(authToken);
 		//End development code
-		//Procution Code
+		//Production Code
 		Credential credential = null;
 		try
 		{
