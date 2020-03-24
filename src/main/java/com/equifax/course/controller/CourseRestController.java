@@ -22,9 +22,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.equifax.course.core.IdList;
 import com.equifax.course.core.MyConstants;
 import com.equifax.course.model.dao.CourseDao;
 import com.equifax.course.model.domain.Course;
+import com.equifax.course.model.domain.Student;
+import com.equifax.course.service.CourseService;
 
 @RestController
 @RequestMapping("/courses")
@@ -32,6 +35,9 @@ public class CourseRestController
 {
 	@Autowired
 	private CourseDao courseDao;
+
+	@Autowired
+	private CourseService courseService;
 
 	@Value("${CourseRestController.general.noid}")
 	private String generalnoid;
@@ -104,7 +110,7 @@ public class CourseRestController
 		else
 		{
 			Map<String, String> errors = new HashMap<String, String>();
-			errors.put("message", generalnoid + id);
+			errors.put("error", generalnoid + id);
 			return new ResponseEntity<Map<String, String>>(errors, HttpStatus.NOT_FOUND);
 		}
 	}
@@ -162,7 +168,7 @@ public class CourseRestController
 		}
 		else
 		{
-			json.put("message", generalnoid + id);
+			json.put("error", generalnoid + id);
 			return new ResponseEntity<Map<String, Object>>(json, HttpStatus.NOT_FOUND);
 		}
 	}
@@ -182,7 +188,68 @@ public class CourseRestController
 		else
 		{
 			Map<String, String> errors = new HashMap<String, String>();
-			errors.put("message", generalnoid + id);
+			errors.put("error", generalnoid + id);
+			return new ResponseEntity<Map<String, String>>(errors, HttpStatus.NOT_FOUND);
+		}
+	}
+
+	// Extra methods. Only admins
+	@PostMapping("/inwithstudents")
+	@Secured({ MyConstants.ROLE_ADMIN })
+	public ResponseEntity<?> inWithStudents(@RequestBody IdList idList)
+	{
+		Map<String, Object> json = new HashMap<String, Object>();
+		List<Object> jsonCourses = new ArrayList<Object>();
+		List<Course> courses = courseService.findByIdInFetchStundents(idList.getIds());
+		if (!courses.isEmpty())
+		{
+			for (Course course : courses)
+			{
+				Map<String, Object> jsonCourse = new HashMap<String, Object>();
+				jsonCourse.put("idCourse", course.getId());
+				jsonCourse.put("code", course.getCode());
+				jsonCourse.put("name", course.getName());
+				List<Object> jsonStudents = new ArrayList<Object>();
+				for (Student student : course.getStudents())
+				{
+					Map<String, Object> jsonStudent = new HashMap<String, Object>();
+					jsonStudent.put("idStudent", student.getId());
+					jsonStudent.put("courseId", student.getCourse().getId());
+					jsonStudent.put("rut", student.getRut());
+					jsonStudent.put("name", student.getName());
+					jsonStudent.put("lastName", student.getLastName());
+					jsonStudent.put("age", student.getAge());
+					jsonStudents.add(jsonStudent);
+				}
+				jsonCourse.put("students", jsonStudents);
+				jsonCourses.add(jsonCourse);
+			}
+			json.put("courses", jsonCourses);
+			return new ResponseEntity<Map<String, Object>>(json, HttpStatus.OK);
+		}
+		else
+		{
+			json.put("error", generalnoid + idList.getIds().toString());
+			return new ResponseEntity<Map<String, Object>>(json, HttpStatus.NOT_FOUND);
+		}
+	}
+
+	@DeleteMapping("/deletecascade/{id}")
+	@Secured({ MyConstants.ROLE_ADMIN })
+	public ResponseEntity<?> deleteCascade(@PathVariable Integer id)
+	{
+		Course currentCourse = courseDao.findById(id).orElse(null);
+		if (currentCourse != null)
+		{
+			courseService.deleteCascade(id);
+			Map<String, Object> json = new HashMap<String, Object>();
+			json.put("message", deletedeleted + id);
+			return new ResponseEntity<Map<String, Object>>(json, HttpStatus.OK);
+		}
+		else
+		{
+			Map<String, String> errors = new HashMap<String, String>();
+			errors.put("error", generalnoid + id);
 			return new ResponseEntity<Map<String, String>>(errors, HttpStatus.NOT_FOUND);
 		}
 	}

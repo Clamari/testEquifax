@@ -32,35 +32,40 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	public JWTAuthenticationFilter(AuthenticationManager authenticationManager)
 	{
 		this.authenticationManager = authenticationManager;
-		setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/token", "POST"));
+		setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/token", "GET")); // use "POST" for production
 	}
 
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException
 	{
-		Credential credential = null;
-		try
-		{
-			credential = new ObjectMapper().readValue(request.getInputStream(), Credential.class);
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-		if(credential != null)
-		{
-			if (credential.getUsername() == null) credential.setUsername("");
-			if (credential.getPassword() == null) credential.setPassword("");
-			UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(credential.getUsername(), credential.getPassword());
-			return authenticationManager.authenticate(authToken);
-		}
-		else
-		{
-			response.setStatus(400);
-			response.setContentType("application/json");
-			response.setCharacterEncoding("UTF-8");
-			return null;
-		}
+		//Development no credentials code. Automatically logs in with a superAdmin account
+		UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken("god", "asdgod");
+		return authenticationManager.authenticate(authToken);
+		//End development code
+		//Procution Code
+//		Credential credential = null;
+//		try
+//		{
+//			credential = new ObjectMapper().readValue(request.getInputStream(), Credential.class);
+//		}
+//		catch (IOException e)
+//		{
+//			e.printStackTrace();
+//		}
+//		if(credential != null)
+//		{
+//			if (credential.getUsername() == null) credential.setUsername("");
+//			if (credential.getPassword() == null) credential.setPassword("");
+//			UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(credential.getUsername(), credential.getPassword());
+//			return authenticationManager.authenticate(authToken);
+//		}
+//		else
+//		{
+//			response.setStatus(400);
+//			response.setContentType("application/json");
+//			response.setCharacterEncoding("UTF-8");
+//			return null;
+//		}
 	}
 
 	@Override
