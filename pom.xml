@@ -9,7 +9,7 @@
 	</parent>
 	<groupId>com.equifax</groupId>
 	<artifactId>restapi</artifactId>
-	<version>1.0.1</version>
+	<version>1.0.2</version>
 	<name>test-equifax</name>
 	<description>Course and students REST maintainer</description>
 
@@ -17,6 +17,26 @@
 		<java.version>11</java.version>
 	</properties>
 
+	<profiles>
+		<profile>
+			<id>local</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<environment>local</environment>
+			</properties>
+		</profile>
+		<profile>
+			<id>gcp</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<environment>gcp</environment>
+			</properties>
+		</profile>
+	</profiles>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -81,6 +101,19 @@
 	</dependencies>
 
 	<build>
+		<filters>
+			<filter>src/main/filters/${environment}.properties</filter>
+		</filters>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+			</resource>
+			<resource>
+				<directory>src/main/config</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -88,5 +121,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
